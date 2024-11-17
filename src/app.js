@@ -48,10 +48,13 @@ app.patch("/user", async (req, res) => {
   const data = req.body;
 
   try {
-     await User.findByIdAndUpdate(userId, data);
+    await User.findByIdAndUpdate(userId, data, {
+      returnDocument: "after",
+      runValidators: true,
+    });
     res.send("Successfully updated");
   } catch (err) {
-    res.status(400).send("Something went wrong");
+    res.status(400).send("UPDATE FAILED:" + err.message);
   }
 });
 
@@ -72,14 +75,36 @@ app.get("/feed", async (req, res) => {
 //add user to db
 app.post("/signup", async (req, res) => {
   const user = new User(req.body);
+  const { emailId } = req.body;
   try {
+    // Check if user already exists with the given emailId
+    const existingUser = await User.findOne({ emailId });
+    if (existingUser) {
+      return res.status(400).send("Email ID already in use");
+    }
     await user.save();
-    res.send("User added succesfully");
+    res.send("User added successfully");
   } catch (err) {
-    res.status(400).send("Error saving the user: " + err.message);
+    if (err.name === "ValidationError") {
+      // Collect validation errors and send a clean response
+      const errorMessages = Object.values(err.errors).map(
+        (error) => error.message
+      );
+      res.status(400).send(errorMessages.join(", "));
+    } else {
+      res.status(400).send("Error saving the user: " + err.message);
+    }
   }
 });
-
+// app.post("/signup", async (req, res) => {
+//     const user = new User(req.body);
+//     try {
+//       await user.save();
+//       res.send("User added succesfully");
+//     } catch (err) {
+//       res.status(400).send("Error saving the user: " + err.message);
+//     }
+//   });
 connectDB()
   .then(() => {
     console.log("Successfully connected to the database");
