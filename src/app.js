@@ -4,8 +4,11 @@ const { connectDB } = require("./config/database");
 const User = require("./models/user");
 const { validateSignUpData, validateLoginData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
 
+//middlewares applied to all route
 app.use(express.json());
+app.use(cookieParser());
 
 //get user by email
 app.get("/user", async (req, res) => {
@@ -143,6 +146,10 @@ app.post("/login", async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (isPasswordValid) {
+      //creating jwt token
+
+      // add token to cookie and send the response to the user
+      res.cookie("token", "hah###ddaha");
       res.send("Login Successful");
     } else {
       throw new Error("Invalid credentials");
@@ -150,6 +157,12 @@ app.post("/login", async (req, res) => {
   } catch (err) {
     res.status(400).send("Error : " + err.message);
   }
+});
+
+app.get("/profile", async (req, res) => {
+  const cookies = req.cookies;
+  console.log(cookies)
+  res.send("This is your data");
 });
 
 connectDB()
