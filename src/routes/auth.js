@@ -15,6 +15,11 @@ authRouter.post("/signup", async (req, res) => {
 
     const { firstName, lastName, emailId, password } = req.body;
     //encrypt the password
+    if (password.length > 64) {
+      throw new Error(
+        "Password exceeds the maximum allowed length of 64 characters."
+      );
+    }
 
     const passwordHash = await bcrypt.hash(password, 10);
 
@@ -71,4 +76,8 @@ authRouter.post("/login", async (req, res) => {
   }
 });
 
+authRouter.post("/logout", (req, res) => {
+  res.cookie("token", null, { expires: new Date(Date.now()) }); //exxpring the token immidiatly
+  res.send("Logged out");
+});
 module.exports = authRouter;
