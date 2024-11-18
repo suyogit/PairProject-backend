@@ -6,6 +6,7 @@ const { validateSignUpData, validateLoginData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const {userAuth}=require("./middlewares/auth")
 
 //middlewares applied to all route
 app.use(express.json());
@@ -160,23 +161,9 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/profile", async (req, res) => {
+app.get("/profile",userAuth, async (req, res) => {
   try {
-    const cookies = req.cookies;
-    console.log(cookies);
-    const { token } = req.cookies;
-    if(!token)
-    {
-      throw new Error("Invalid token")
-    }
-    const decodedMessage = await jwt.verify(token, "#DEMON");
-    const { _id } = decodedMessage;
-    console.log("This user's id is" + _id);
-    const user = await User.findById(_id);
-    if(!user)
-    {
-      throw new Error("Cannot find user")
-    }
+   const user= req.user
     res.send("This is your data" + user);
   } catch (err) {
     res.status(400).send("Error : " + err.message);
