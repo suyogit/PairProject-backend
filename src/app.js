@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const { connectDB } = require("./config/database");
 const User = require("./models/user");
+const { validateSignUpData, validateLoginData } = require("./utils/validation");
+const bcrypt = require("bcrypt");
 
 app.use(express.json());
 
@@ -56,9 +58,8 @@ app.patch("/user/:userId", async (req, res) => {
     if (!isUpdateAllowed) {
       throw new Error("Update not allowed");
     }
-    if(data?.skills.length>10)
-    {
-        throw new Error("Cannot add more than 10 skills");
+    if (data?.skills.length > 10) {
+      throw new Error("Cannot add more than 10 skills");
     }
     await User.findByIdAndUpdate(userId, data, {
       returnDocument: "after",
@@ -86,9 +87,22 @@ app.get("/feed", async (req, res) => {
 
 //add user to db
 app.post("/signup", async (req, res) => {
-  const user = new User(req.body);
-  const { emailId } = req.body;
   try {
+    //validation of data
+    validateSignUpData(req);
+
+    const { firstName, lastName, emailId, password } = req.body;
+    //encrypt the password
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: passwordHash,
+    });
+
     // Check if user already exists with the given emailId
     const existingUser = await User.findOne({ emailId });
     if (existingUser) {
@@ -117,6 +131,27 @@ app.post("/signup", async (req, res) => {
 //       res.status(400).send("Error saving the user: " + err.message);
 //     }
 //   });
+
+app.post("/login", async (req, res) => {
+  try {
+    validateLoginData(req);
+    const { emailId, password } = req.body;
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error("Invalid credentials");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (isPasswordValid) {
+      res.send("Login Successful");
+    } else {
+      throw new Error("Invalid credentials");
+    }
+  } catch (err) {
+    res.status(400).send("Error : " + err.message);
+  }
+});
+
 connectDB()
   .then(() => {
     console.log("Successfully connected to the database");

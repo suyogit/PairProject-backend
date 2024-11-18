@@ -53,13 +53,13 @@ const userSchema = new mongoose.Schema(
     },
     age: {
       type: Number,
-      required: [true, "Age is required"],
+      // required: [true, "Age is required"],
       min: [18, "Age must be at least 18"],
       max: [120, "Age cannot exceed 120"], // Maximum age is 120
     },
     gender: {
       type: String,
-      required: [true, "Gender is required"],
+      // required: [true, "Gender is required"],
       validate(value) {
         if (!["male", "female", "others"].includes(value)) {
           throw new Error(
