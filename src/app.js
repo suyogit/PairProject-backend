@@ -2,8 +2,15 @@ const express = require("express");
 const app = express();
 const { connectDB } = require("./config/database");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
 //middlewares applied to all route
+app.use(
+  cors({
+    origin: "http://localhost:5174",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
@@ -15,7 +22,7 @@ const usertRouter = require("./routes/user");
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
-app.use("/", usertRouter)
+app.use("/", usertRouter);
 
 connectDB()
   .then(() => {
