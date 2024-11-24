@@ -35,8 +35,13 @@ authRouter.post("/signup", async (req, res) => {
     if (existingUser) {
       return res.status(400).send("Email ID already in use");
     }
-    await user.save();
-    res.send("User added successfully");
+    const savedUser = await user.save();
+    const token = await savedUser.getJWT();
+    // add token to cookie and send the response to the user
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 7 * 24 * 360000),
+    }); // 1 hour has 3600000 milliseconds
+    res.json({ message: "User Added successfully!", data: savedUser });
   } catch (err) {
     if (err.name === "ValidationError") {
       // Collect validation errors and send a clean response

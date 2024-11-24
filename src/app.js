@@ -7,7 +7,7 @@ const cors = require("cors");
 //middlewares applied to all route
 app.use(
   cors({
-    origin: "http://localhost:5174",
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
