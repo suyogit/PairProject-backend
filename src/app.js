@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+const PORT = process.env.PORT || 3000;
 const express = require("express");
 const app = express();
 const { connectDB } = require("./config/database");
@@ -27,8 +31,8 @@ app.use("/", usertRouter);
 connectDB()
   .then(() => {
     console.log("Successfully connected to the database");
-    app.listen(3000, () => {
-      console.log("Server started on port 3000");
+    app.listen(PORT, () => {
+      console.log("Server started on port " + PORT);
     });
   })
   .catch((err) => {
