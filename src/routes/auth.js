@@ -38,9 +38,15 @@ authRouter.post("/signup", async (req, res) => {
     const savedUser = await user.save();
     const token = await savedUser.getJWT();
     // add token to cookie and send the response to the user
+    // res.cookie("token", token, {
+    //   expires: new Date(Date.now() + 7 * 24 * 360000),
+    // }); // 1 hour has 3600000 milliseconds
     res.cookie("token", token, {
-      expires: new Date(Date.now() + 7 * 24 * 360000),
-    }); // 1 hour has 3600000 milliseconds
+      httpOnly: true,       // Makes the cookie inaccessible to client-side scripts
+      secure: true,         // Ensures cookies are sent over HTTPS only
+      sameSite: "none",     // Required for cross-origin requests
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    });
     res.json({ message: "User Added successfully!", data: savedUser });
   } catch (err) {
     if (err.name === "ValidationError") {
@@ -69,9 +75,15 @@ authRouter.post("/login", async (req, res) => {
       //creating jwt token
       const token = await user.getJWT();
       // add token to cookie and send the response to the user
+      // res.cookie("token", token, {
+      //   expires: new Date(Date.now() + 7 * 24 * 360000),
+      // }); // 1 hour has 3600000 milliseconds
       res.cookie("token", token, {
-        expires: new Date(Date.now() + 7 * 24 * 360000),
-      }); // 1 hour has 3600000 milliseconds
+        httpOnly: true,       // Makes the cookie inaccessible to client-side scripts
+        secure: true,         // Ensures cookies are sent over HTTPS only
+        sameSite: "none",     // Required for cross-origin requests
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      });
       res.send(user);
     } else {
       throw new Error("Invalid credentials");
