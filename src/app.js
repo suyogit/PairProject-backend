@@ -11,7 +11,7 @@ const cors = require("cors");
 //middlewares applied to all route
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://pairproject.onrender.com",
     credentials: true,
   })
 );
