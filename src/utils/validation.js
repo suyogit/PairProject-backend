@@ -7,7 +7,9 @@ const validateSignUpData = (req) => {
   } else if (!validator.isEmail(emailId)) {
     throw new Error("Email is not valid");
   } else if (!validator.isStrongPassword(password)) {
-    throw new Error("Please enter strong password");
+    throw new Error(
+      "Password must be 8+ characters with 1 uppercase, 1 lowercase, 1 number, and 1 special character"
+    );
   }
 };
 const validateLoginData = (req) => {
