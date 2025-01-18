@@ -7,7 +7,8 @@ const app = express();
 const { connectDB } = require("./config/database");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const initializeSocket=require("./utils/socket")
+const initializeSocket = require("./utils/socket");
+const http = require("http");
 
 //middlewares applied to all route
 app.use(
