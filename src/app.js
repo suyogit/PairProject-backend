@@ -7,11 +7,13 @@ const app = express();
 const { connectDB } = require("./config/database");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const initializeSocket=require("./utils/socket")
 
 //middlewares applied to all route
 app.use(
   cors({
-    origin: "https://pairproject.onrender.com",
+    // origin: "https://pairproject.onrender.com",
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
@@ -28,10 +30,12 @@ app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", usertRouter);
 
+const server = http.createServer(app);
+initializeSocket(server);
 connectDB()
   .then(() => {
     console.log("Successfully connected to the database");
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log("Server started on port " + PORT);
     });
   })
